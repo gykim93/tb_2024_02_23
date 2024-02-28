@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-class App {
+public class App {
   Scanner scanner;
-  int lastQuotationid;
-
+  int lastQuotationId;
   List<Quotation> quotations;
-  App(){
+
+  App() {
     scanner = new Scanner(System.in);
-    lastQuotationid = 0;
+    lastQuotationId = 0;
     quotations = new ArrayList<>();
   }
 
@@ -21,17 +21,15 @@ class App {
     while (true) {
       System.out.print("명령) ");
 
-
       String cmd = scanner.nextLine();
 
       if (cmd.equals("종료")) {
         break;
       } else if (cmd.equals("등록")) {
         actionWrite();
-        System.out.printf("%d번 명언이 등록되었습니다.\n", lastQuotationid);
       } else if (cmd.equals("목록")) {
         actionList();
-      } else if(cmd.startsWith("삭제?")){
+      } else if (cmd.startsWith("삭제?")) {
         actionRemove(cmd);
       }
     }
@@ -43,30 +41,52 @@ class App {
 
     System.out.print("작가 : ");
     String authorName = scanner.nextLine();
-    lastQuotationid++;
-    int id = lastQuotationid;
+
+    lastQuotationId++;
+    int id = lastQuotationId;
 
     Quotation quotation = new Quotation(id, content, authorName);
     quotations.add(quotation);
 
+    System.out.printf("%d번 명언이 등록되었습니다.\n", lastQuotationId);
   }
 
   void actionList() {
     System.out.println("번호 / 작가 / 명언");
 
-    System.out.println("--------------------");
+    System.out.println("----------------------");
 
-    if (quotations.isEmpty()) System.out.println("등록된 명언이 없습니다.");
+    if (quotations.isEmpty())
+      System.out.println("등록된 명언이 없습니다.");
 
     for (int i = quotations.size() - 1; i >= 0; i--) {
       Quotation quotation = quotations.get(i);
       System.out.printf("%d / %s / %s\n", quotation.id, quotation.authorName, quotation.content);
     }
   }
-  void actionRemove(String cmd){
-    String idStr = cmd.replace("삭제?id=", "");
-    int id = Integer.parseInt(idStr);
 
-    System.out.printf("%d번 명언을 삭제합니다\n", id);
+  void actionRemove(String cmd) {
+    String[] cmdBits = cmd.split("\\?", 2);
+    String action = cmdBits[0];
+    String queryString = cmdBits[1];
+
+    String[] queryStringBits = queryString.split("&");
+
+    int id = 0;
+
+    for (int i = 0; i < queryStringBits.length; i++) {
+      String queryParamStr = queryStringBits[i];
+
+      String[] queryParamStrBits = queryParamStr.split("=", 2);
+
+      String paramName = queryParamStrBits[0];
+      String paramValue = queryParamStrBits[1];
+
+      if (paramName.equals("id")) {
+        id = Integer.parseInt(paramValue);
+      }
+    }
+
+    System.out.printf("%d번 명언을 삭제합니다.\n", id);
   }
 }
